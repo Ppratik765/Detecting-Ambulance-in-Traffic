@@ -1,4 +1,4 @@
-# 🚨 Audio-Visual Sensor Fusion for Emergency Vehicle Preemption
+# Audio-Visual Sensor Fusion for Emergency Vehicle Preemption
 
 [![Vite](https://img.shields.io/badge/Frontend-Vite%20%2B%20Vanilla%20JS-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![YOLOv8](https://img.shields.io/badge/Computer%20Vision-YOLOv8%20Nano-00FFFF?logo=ultralytics&logoColor=black)](https://github.com/ultralytics/ultralytics)
@@ -9,15 +9,15 @@ An end-to-end Intelligent Transportation Systems (ITS) command center that fuses
 
 ---
 
-## 🏛️ System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TD
-    subgraph VideoFeed["📹 Optical & Acoustic Stream"]
+    subgraph VideoFeed["Optical & Acoustic Stream"]
         RAW["Traffic Video Stream (H.264 / AAC)"]
     end
 
-    subgraph ColabML["☁️ Colab T4 ML Pipeline (colab/fusion_pipeline.ipynb)"]
+    subgraph ColabML["Colab T4 ML Pipeline (colab/fusion_pipeline.ipynb)"]
         YOLO["YOLOv8 Nano Vehicle Tracker<br/>(Class, Bounding Box, Proximity)"]
         MEL["PyTorch Mel-Spectrogram CNN<br/>(700-1600Hz Siren Harmonic Detection)"]
         
@@ -32,13 +32,13 @@ flowchart TD
         EXPORT["Export Artifacts<br/>telemetry.json + ambulance_feed.mp4"]
     end
 
-    subgraph Frontend["🖥️ Real-Time Command Center (frontend/)"]
+    subgraph Frontend["Real-Time Command Center (frontend/)"]
         PLAYER["HTML5 Video Player + Time Scrubber"]
         CANVAS["Canvas Overlay: YOLO Bounding Boxes"]
         GAUGES["Circular SVG Gauges: P_vision, P_audio, P_fusion"]
         TRAFFIC["SVG 4-Way Intersection Signal Controller"]
         AUDIO_VIZ["Web Audio API Waveform & Spectrogram"]
-        BANNER["🚨 Flashing CSS Strobe Emergency Banner"]
+        BANNER["Flashing CSS Strobe Emergency Banner"]
     end
 
     RAW --> YOLO --> P_VIS --> FUSION
@@ -59,7 +59,7 @@ flowchart TD
 
 ---
 
-## 📐 Mathematical Formulation: Late Bayesian Fusion
+## Mathematical Formulation: Late Bayesian Fusion
 
 Single-modality emergency preemption creates severe failure risks in real-world urban canyons:
 * **Visual Occlusion:** Large trucks or double-decker buses block optical sightlines.
@@ -82,7 +82,7 @@ $$\text{Signal State} = \begin{cases}
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```text
 its-emergency-detection/
@@ -111,7 +111,7 @@ its-emergency-detection/
 
 ---
 
-## 🚀 Step-by-Step Google Colab Workflow
+## Step-by-Step Google Colab Workflow
 
 Follow these instructions to run the machine learning pipeline on Google Colab:
 
@@ -125,7 +125,7 @@ Follow these instructions to run the machine learning pipeline on Google Colab:
 ### 2. Video Sourcing & Ingestion (Step 2 in Colab)
 In Step 2 of the notebook, choose your preferred ingestion method:
 
-#### 🔍 Recommended YouTube Search Queries:
+#### Recommended YouTube Search Queries:
 If using YouTube, search for any of these queries on YouTube:
 * `ambulance sirens intersection dashcam`
 * `ambulance emergency response lights and sirens intersection`
@@ -137,7 +137,7 @@ If using YouTube, search for any of these queries on YouTube:
 * Look for clips where an ambulance approaches the camera/intersection and sirens are clearly audible.
 * Copy the YouTube link and paste it into the `YOUTUBE_URL` form field in Colab.
 
-#### 📤 Method B: Upload Direct Video File (Most Reliable)
+#### Method B: Upload Direct Video File (Most Reliable)
 Because YouTube occasionally throttles or bot-blocks Google Colab cloud IP addresses, the notebook includes a direct upload option (`files.upload()`):
 1. Download your chosen traffic video to your computer.
 2. Select **Upload Video File (Recommended)** in the Colab dropdown.
@@ -157,9 +157,9 @@ You have two ways to load the Colab artifacts:
 
 * **Option A (In-Browser Direct Loader - Easiest!):**
   1. Open the running dashboard at `http://localhost:5173`.
-  2. Click **📂 Load Colab telemetry.json** in the top toolbar and select your downloaded `telemetry.json`.
-  3. Click **📹 Load Colab Video** and select your downloaded `ambulance_feed.mp4`.
-  4. The dashboard will instantly switch to **🟢 VERIFIED COLAB PIPELINE** mode!
+  2. Click **Load Colab telemetry.json** in the top toolbar and select your downloaded `telemetry.json`.
+  3. Click **Load Colab Video** and select your downloaded `ambulance_feed.mp4`.
+  4. The dashboard will instantly switch to **[VERIFIED] COLAB PIPELINE** mode!
 
 * **Option B (File System Replacement):**
   1. Move your downloaded `telemetry.json` into: `frontend/public/data/telemetry.json`
@@ -168,7 +168,7 @@ You have two ways to load the Colab artifacts:
 
 ---
 
-## 💻 Local Frontend Dashboard Setup
+## Local Frontend Dashboard Setup
 
 The frontend is powered by Vite and Vanilla JavaScript for maximum performance and instant sub-millisecond timeline synchronization.
 
@@ -192,15 +192,15 @@ npm run preview
 
 ---
 
-## 🎮 Interactive Features & Hotkeys
+## Interactive Features & Hotkeys
 
 * **Spacebar or Play Button:** Toggle video playback.
 * **Timeline Slider:** Scrub through the 30-second timeline. Watch the bounding boxes, circular confidence gauges, and 4-way traffic signals update instantly with zero lag.
-* **⚡ JUMP TO EVENT Button:** Seeks directly to $t = 9.50\text{s}$ where siren confidence spikes and the Emergency Green Corridor triggers.
-* **🚨 FORCE PREEMPTION Button:** Manually override the traffic signal controller to test dispatch protocols.
-* **🔇 Audio Mute Button:** Toggle siren sound and connect Web Audio API frequency analyzer.
+* **JUMP TO EVENT Button:** Seeks directly to $t = 9.50\text{s}$ where siren confidence spikes and the Emergency Green Corridor triggers.
+* **FORCE PREEMPTION Button:** Manually override the traffic signal controller to test dispatch protocols.
+* **Audio Mute Button:** Toggle siren sound and connect Web Audio API frequency analyzer.
 
 ---
 
-## 📄 License
+## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

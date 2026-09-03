@@ -15,7 +15,7 @@
   <div id="emergency-banner" class="emergency-banner hidden" role="alert" aria-live="assertive">
     <div class="banner-pulse"></div>
     <div class="banner-content">
-      <div class="banner-icon">🚨</div>
+      <div class="banner-icon"><span class="banner-badge">[ALERT]</span></div>
       <div class="banner-text">
         <div class="banner-title">EMERGENCY GREEN CORRIDOR TRIGGERED</div>
         <div class="banner-subtitle">NORTH-BOUND APPROACH LOCKED GREEN &bull; CONFLICTING LANES FORCED RED</div>
@@ -64,13 +64,13 @@
         <input type="file" id="file-video-input" accept="video/mp4,video/*" style="display: none;" />
 
         <button id="btn-load-telemetry" class="btn btn-sm btn-accent" title="Upload telemetry.json downloaded from Google Colab">
-          📂 Load Colab telemetry.json
+          Load Colab telemetry.json
         </button>
         <button id="btn-load-video" class="btn btn-sm btn-accent" title="Upload ambulance_feed.mp4 downloaded from Google Colab">
-          📹 Load Colab Video
+          Load Colab Video
         </button>
         <button id="btn-toggle-demo" class="btn btn-sm btn-outline" title="Toggle between Benchmark Demo and Clean Standby">
-          🔄 Standby / Blank Mode
+          Standby / Blank Mode
         </button>
       </div>
     </div>
@@ -83,7 +83,7 @@
         <div class="card video-card">
           <div class="card-header">
             <div class="card-title">
-              <span class="card-icon">📹</span>
+              <span class="badge badge-tech">CAM-01</span>
               <span>OPTICAL CAMERA FEED [CAM-01]</span>
             </div>
             <div class="card-badges">
@@ -129,11 +129,11 @@
           <!-- Video Playback Scrub & Transport Controls -->
           <div class="video-controls">
             <button id="btn-play-pause" class="btn btn-ctrl" title="Play / Pause (Space)">
-              <span id="play-pause-icon">▶</span>
+              <span id="play-pause-icon">PLAY</span>
             </button>
-            <button id="btn-restart" class="btn btn-ctrl" title="Restart from beginning">⏮</button>
+            <button id="btn-restart" class="btn btn-ctrl" title="Restart from beginning">RESET</button>
             <button id="btn-jump-siren" class="btn btn-ctrl btn-accent" title="Jump to Siren Event (t=9.5s)">
-              ⚡ JUMP TO EVENT
+              JUMP TO EVENT
             </button>
 
             <!-- Timeline Scrubber -->
@@ -158,7 +158,7 @@
             </div>
 
             <button id="btn-audio-mute" class="btn btn-ctrl" title="Mute / Unmute Siren Audio">
-              <span id="mute-icon">🔇</span>
+              <span id="mute-icon">AUDIO</span>
             </button>
 
             <select id="playback-speed-select" class="speed-select" title="Playback Speed">
@@ -177,7 +177,7 @@
         <div class="card gauges-card">
           <div class="card-header">
             <div class="card-title">
-              <span class="card-icon">⚡</span>
+              <span class="badge badge-tech">METRICS</span>
               <span>MULTIMODAL SENSOR CONFIDENCE GAUGES</span>
             </div>
             <div class="card-badges">
@@ -248,7 +248,7 @@
         <div class="card traffic-card">
           <div class="card-header">
             <div class="card-title">
-              <span class="card-icon">🚦</span>
+              <span class="badge badge-tech">SIGNALS</span>
               <span>ADAPTIVE SIGNAL CONTROLLER [4-WAY INTERSECTION]</span>
             </div>
             <div class="card-badges">
@@ -265,7 +265,7 @@
         <div class="card audio-viz-card">
           <div class="card-header">
             <div class="card-title">
-              <span class="card-icon">🔊</span>
+              <span class="badge badge-tech">SPECTRUM</span>
               <span>ACOUSTIC SIREN SPECTRAL ANALYZER</span>
             </div>
             <div class="card-badges">
@@ -282,12 +282,12 @@
         <div class="card telemetry-card">
           <div class="card-header">
             <div class="card-title">
-              <span class="card-icon">💻</span>
+              <span class="badge badge-tech">DISPATCH</span>
               <span>SYSTEM EVENT DISPATCH & OVERRIDE</span>
             </div>
             <div class="card-actions">
-              <button id="btn-force-preempt" class="btn btn-sm btn-danger">🚨 FORCE PREEMPTION</button>
-              <button id="btn-reset-signal" class="btn btn-sm btn-outline">↺ RESET CYCLE</button>
+              <button id="btn-force-preempt" class="btn btn-sm btn-danger">FORCE PREEMPTION</button>
+              <button id="btn-reset-signal" class="btn btn-sm btn-outline">RESET CYCLE</button>
             </div>
           </div>
 
@@ -303,7 +303,7 @@
 
   <!-- Audio Context Activator Notice (if browser blocks unmuted audio) -->
   <div id="audio-notice" class="audio-notice hidden">
-    <span>🔇 Click anywhere to enable siren audio stream</span>
+    <span>Click anywhere to enable siren audio stream</span>
   </div>
 
   <script type="module" src="/src/main.js"></script>

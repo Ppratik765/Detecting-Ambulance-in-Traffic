@@ -70,7 +70,7 @@ export class PreemptionManager {
       this.logEvent(
         timestamp,
         'preempt',
-        `🚨 PREEMPTION ACTIVATED: P_fusion = ${pFusion.toFixed(3)} >= 0.75. Green corridor locked.`
+        `[ALERT] PREEMPTION ACTIVATED: P_fusion = ${pFusion.toFixed(3)} >= 0.75. Green corridor locked.`
       );
     } else if (!shouldPreempt && this.active) {
       // Transition from preemption back to normal

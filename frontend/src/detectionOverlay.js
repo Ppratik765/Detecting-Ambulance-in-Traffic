@@ -63,7 +63,7 @@ export class DetectionOverlay {
     if (this.hudTargetText) {
       const hasEmergency = detections.some(d => d.class === 'truck' || d.is_emergency);
       if (preemptionActive || hasEmergency) {
-        this.hudTargetText.textContent = '🚨 AMBULANCE (CORRIDOR PRIORITY)';
+        this.hudTargetText.textContent = '[AMBULANCE] (CORRIDOR PRIORITY)';
         this.hudTargetText.className = 'target-emergency';
       } else if (detections.length > 0) {
         this.hudTargetText.textContent = 'CIVILIAN TRAFFIC DETECTED';

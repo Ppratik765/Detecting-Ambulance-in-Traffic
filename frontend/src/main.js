@@ -67,7 +67,7 @@ class AppSyncEngine {
   }
 
   async init() {
-    console.log('🚀 Initializing ITS Audio-Visual Fusion Command Center...');
+    console.log('Initializing ITS Audio-Visual Fusion Command Center...');
     await this.loadTelemetry();
     this.setupEventListeners();
     this.visualizer.start();
@@ -228,7 +228,7 @@ class AppSyncEngine {
     };
 
     this.video.addEventListener('play', () => {
-      this.playIcon.textContent = '⏸';
+      this.playIcon.textContent = 'PAUSE';
       this.playOverlayBtn.classList.add('hidden');
       this.visualizer.connectAudio();
       this.visualizer.resumeContext();
@@ -242,12 +242,12 @@ class AppSyncEngine {
     });
 
     this.video.addEventListener('pause', () => {
-      this.playIcon.textContent = '▶';
+      this.playIcon.textContent = 'PLAY';
       this.playOverlayBtn.classList.remove('hidden');
     });
 
     this.video.addEventListener('ended', () => {
-      this.playIcon.textContent = '▶';
+      this.playIcon.textContent = 'PLAY';
       this.playOverlayBtn.classList.remove('hidden');
       this.syncFrame(this.duration);
     });
@@ -338,7 +338,7 @@ class AppSyncEngine {
     if (this.muteBtn) {
       this.muteBtn.addEventListener('click', () => {
         this.video.muted = !this.video.muted;
-        this.muteIcon.textContent = this.video.muted ? '🔇' : '🔊';
+        this.muteIcon.textContent = this.video.muted ? 'MUTED' : 'AUDIO';
         this.preemptionManager.setMuted(this.video.muted);
         this.visualizer.connectAudio();
         this.visualizer.resumeContext();
@@ -353,7 +353,7 @@ class AppSyncEngine {
         this.syncFrame(this.video.currentTime);
 
         if (this.manualPreemptActive) {
-          this.forcePreemptBtn.textContent = '❌ CANCEL OVERRIDE';
+          this.forcePreemptBtn.textContent = 'CANCEL OVERRIDE';
           this.forcePreemptBtn.className = 'btn btn-sm btn-outline';
           this.preemptionManager.logEvent(
             this.video.currentTime,
@@ -361,7 +361,7 @@ class AppSyncEngine {
             'MANUAL DISPATCH OVERRIDE: Emergency corridor forced ON.'
           );
         } else {
-          this.forcePreemptBtn.textContent = '🚨 FORCE PREEMPTION';
+          this.forcePreemptBtn.textContent = 'FORCE PREEMPTION';
           this.forcePreemptBtn.className = 'btn btn-sm btn-danger';
           this.preemptionManager.logEvent(
             this.video.currentTime,
@@ -377,7 +377,7 @@ class AppSyncEngine {
         this.manualPreemptActive = false;
         this.trafficLight.setManualOverride(false);
         if (this.forcePreemptBtn) {
-          this.forcePreemptBtn.textContent = '🚨 FORCE PREEMPTION';
+          this.forcePreemptBtn.textContent = 'FORCE PREEMPTION';
           this.forcePreemptBtn.className = 'btn btn-sm btn-danger';
         }
         this.syncFrame(this.video.currentTime);
@@ -409,7 +409,7 @@ class AppSyncEngine {
             this.frames = parsed.frames;
             this.currentMode = 'colab';
             if (this.dataSourceBadge) {
-              this.dataSourceBadge.textContent = '🟢 VERIFIED COLAB TELEMETRY';
+              this.dataSourceBadge.textContent = '[VERIFIED] COLAB TELEMETRY';
               this.dataSourceBadge.className = 'badge badge-colab';
             }
             if (this.dataSourceHint) {
@@ -447,7 +447,7 @@ class AppSyncEngine {
           `Loaded Colab video feed: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB).`
         );
         if (this.currentMode === 'colab' && this.dataSourceBadge) {
-          this.dataSourceBadge.textContent = '🟢 VERIFIED COLAB PIPELINE (VIDEO + DATA)';
+          this.dataSourceBadge.textContent = '[VERIFIED] COLAB PIPELINE (VIDEO + DATA)';
         }
       });
     }
@@ -465,7 +465,7 @@ class AppSyncEngine {
           if (this.dataSourceHint) {
             this.dataSourceHint.textContent = '(Canvas cleared. Awaiting Colab upload or click "Switch to Demo")';
           }
-          this.btnToggleDemo.textContent = '▶ Switch to Demo Benchmark';
+          this.btnToggleDemo.textContent = 'Switch to Demo Benchmark';
           this.btnToggleDemo.className = 'btn btn-sm btn-accent';
           this.preemptionManager.logEvent(0, 'info', 'Switched to clean Standby mode. Canvas overlays cleared.');
           this.syncFrame(0);
@@ -478,7 +478,7 @@ class AppSyncEngine {
           if (this.dataSourceHint) {
             this.dataSourceHint.textContent = '(Showing baseline sample. Run Colab notebook to generate real YOLOv8 & PyTorch inferences)';
           }
-          this.btnToggleDemo.textContent = '🔄 Standby / Blank Mode';
+          this.btnToggleDemo.textContent = 'Standby / Blank Mode';
           this.btnToggleDemo.className = 'btn btn-sm btn-outline';
           this.preemptionManager.logEvent(0, 'info', 'Switched to benchmark demo mode.');
           this.syncFrame(this.video.currentTime);

@@ -286,14 +286,14 @@ export class TrafficLightController {
 
       // Update HUD status
       if (this.badge) {
-        this.badge.textContent = '🚨 PREEMPTION: GREEN CORRIDOR';
+        this.badge.textContent = '[PREEMPTION] GREEN CORRIDOR';
         this.badge.className = 'badge badge-preempt';
       }
       if (this.preemptionPill) {
         this.preemptionPill.className = 'status-pill status-active';
       }
       if (this.preemptionPillText) {
-        this.preemptionPillText.textContent = '🚨 ACTIVE: GREEN CORRIDOR LOCKED';
+        this.preemptionPillText.textContent = '[ACTIVE] GREEN CORRIDOR LOCKED';
       }
 
     } else {

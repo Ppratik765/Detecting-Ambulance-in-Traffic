@@ -62,7 +62,7 @@ export class AudioVisualizer {
       this.analyser.connect(this.audioCtx.destination);
 
       this.isInitialized = true;
-      console.log('🔊 Web Audio API successfully connected to video stream.');
+      console.log('[AUDIO] Web Audio API successfully connected to video stream.');
     } catch (err) {
       console.warn('Web Audio API connection notice (will use fallback):', err);
     }
@@ -205,7 +205,7 @@ export class AudioVisualizer {
 
     if (this.lockBadge) {
       if (isLocked) {
-        this.lockBadge.textContent = '🚨 HARMONIC LOCK (SIREN ACTIVE)';
+        this.lockBadge.textContent = '[HARMONIC LOCK] SIREN ACTIVE';
         this.lockBadge.className = 'badge badge-preempt';
       } else {
         this.lockBadge.textContent = 'NO HARMONIC LOCK';

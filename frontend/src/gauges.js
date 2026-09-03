@@ -86,7 +86,7 @@ export class GaugeController {
 
     if (this.subFusion) {
       if (preemptionActive || f >= 0.75) {
-        this.subFusion.textContent = '🚨 TRIGGERED';
+        this.subFusion.textContent = '[ALERT] TRIGGERED';
         this.subFusion.style.color = '#ef4444';
       } else if (f >= 0.45) {
         this.subFusion.textContent = 'CAUTION';
