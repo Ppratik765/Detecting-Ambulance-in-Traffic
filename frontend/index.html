@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ITS Audio-Visual Sensor Fusion | Emergency Preemption System</title>
+  <meta name="description" content="Intelligent Transportation Systems dashboard fusing YOLOv8 optical telemetry with Mel-Spectrogram acoustic siren detection for autonomous traffic signal preemption." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body class="theme-dark">
+  <!-- Strobe / Emergency Banner Overlay -->
+  <div id="emergency-banner" class="emergency-banner hidden" role="alert" aria-live="assertive">
+    <div class="banner-pulse"></div>
+    <div class="banner-content">
+      <div class="banner-icon">🚨</div>
+      <div class="banner-text">
+        <div class="banner-title">EMERGENCY GREEN CORRIDOR TRIGGERED</div>
+        <div class="banner-subtitle">NORTH-BOUND APPROACH LOCKED GREEN &bull; CONFLICTING LANES FORCED RED</div>
+      </div>
+      <div class="banner-badge">P<sub>fusion</sub> &ge; 0.75</div>
+    </div>
+  </div>
+
+  <div class="app-shell">
+    <!-- Top Navigation / Telemetry Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="sys-logo">
+          <div class="logo-pulse"></div>
+          <span class="logo-text">ITS PREEMPTION SENSOR FUSION</span>
+        </div>
+        <div class="sys-badge">NODE-7A // INTERSECTION 42</div>
+      </div>
+
+      <div class="header-center">
+        <div class="fusion-formula-pill" title="Late Bayesian Fusion Equation">
+          <span class="formula-label">BAYESIAN FUSION:</span>
+          <span class="formula-math">P<sub>fusion</sub> = 1 &minus; (1 &minus; P<sub>vis</sub>) &times; (1 &minus; P<sub>aud</sub>)</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div id="preemption-status-pill" class="status-pill status-standby">
+          <span class="pill-dot"></span>
+          <span id="preemption-status-text">STANDBY: NORMAL CYCLE</span>
+        </div>
+        <div class="timecode-display" id="master-timecode">00:00.00</div>
+      </div>
+    </header>
+
+    <!-- Main Split-Screen Workspace -->
+    <main class="main-workspace">
+      <!-- Left Pane (55%): Optical Feed & Video Canvas Overlay -->
+      <section class="left-pane" aria-label="Camera Video Feed and YOLO Detections">
+        <div class="card video-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon">📹</span>
+              <span>OPTICAL CAMERA FEED [CAM-01]</span>
+            </div>
+            <div class="card-badges">
+              <span class="badge badge-tech">YOLOv8 NANO</span>
+              <span class="badge badge-fps" id="video-fps-display">30 FPS</span>
+              <span class="badge badge-live">● SYNCED</span>
+            </div>
+          </div>
+
+          <div class="video-container" id="video-container">
+            <!-- Video Player -->
+            <video
+              id="video-player"
+              src="/videos/ambulance_feed.mp4"
+              preload="auto"
+              playsinline
+              muted
+            ></video>
+
+            <!-- Real-time YOLO Canvas Overlay -->
+            <canvas id="detection-canvas" class="detection-canvas"></canvas>
+
+            <!-- Video HUD Indicators -->
+            <div class="video-hud top-hud">
+              <div class="hud-item"><span class="hud-label">FOV:</span> 120&deg; CORRIDOR</div>
+              <div class="hud-item"><span class="hud-label">TARGET:</span> <span id="hud-target-text">SCANNING</span></div>
+              <div class="hud-item"><span class="hud-label">ACTIVE BOXES:</span> <span id="hud-box-count">0</span></div>
+            </div>
+
+            <div class="video-hud bottom-hud">
+              <div class="hud-item"><span class="hud-label">SENSOR:</span> SONY IMX477 4K</div>
+              <div class="hud-item"><span class="hud-label">LATENCY:</span> 18ms</div>
+            </div>
+
+            <!-- Play/Pause Overlay Icon -->
+            <button id="video-play-overlay-btn" class="play-overlay-btn" aria-label="Play or Pause Video">
+              <svg viewBox="0 0 24 24" width="48" height="48" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Video Playback Scrub & Transport Controls -->
+          <div class="video-controls">
+            <button id="btn-play-pause" class="btn btn-ctrl" title="Play / Pause (Space)">
+              <span id="play-pause-icon">▶</span>
+            </button>
+            <button id="btn-restart" class="btn btn-ctrl" title="Restart from beginning">⏮</button>
+            <button id="btn-jump-siren" class="btn btn-ctrl btn-accent" title="Jump to Siren Event (t=9.5s)">
+              ⚡ JUMP TO EVENT
+            </button>
+
+            <!-- Timeline Scrubber -->
+            <div class="timeline-container">
+              <input
+                type="range"
+                id="timeline-scrubber"
+                class="timeline-slider"
+                min="0"
+                max="30"
+                step="0.01"
+                value="0"
+                aria-label="Video Timeline Scrubber"
+              />
+              <div id="timeline-progress" class="timeline-progress-bar"></div>
+              <!-- Preemption Zone Marker on Timeline -->
+              <div class="timeline-marker" style="left: 31%; width: 50%;" title="Preemption Active Window (t=9.5s - 24.5s)"></div>
+            </div>
+
+            <div class="video-time-readout">
+              <span id="current-time-readout">00:00.00</span> / <span id="duration-readout">00:30.00</span>
+            </div>
+
+            <button id="btn-audio-mute" class="btn btn-ctrl" title="Mute / Unmute Siren Audio">
+              <span id="mute-icon">🔇</span>
+            </button>
+
+            <select id="playback-speed-select" class="speed-select" title="Playback Speed">
+              <option value="0.5">0.5x</option>
+              <option value="1" selected>1.0x</option>
+              <option value="1.5">1.5x</option>
+              <option value="2">2.0x</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Pane (45%): Command Center -->
+      <section class="right-pane" aria-label="Telemetry and Signal Controller Command Center">
+        <!-- 1. Circular Telemetry Progress Gauges -->
+        <div class="card gauges-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon">⚡</span>
+              <span>MULTIMODAL SENSOR CONFIDENCE GAUGES</span>
+            </div>
+            <div class="card-badges">
+              <span class="badge badge-threshold">THRESHOLD: 0.75</span>
+            </div>
+          </div>
+
+          <div class="gauges-grid">
+            <!-- Gauge 1: Vision Confidence -->
+            <div class="gauge-item">
+              <div class="gauge-svg-wrapper">
+                <svg class="gauge-svg" viewBox="0 0 120 120">
+                  <circle class="gauge-bg" cx="60" cy="60" r="48" />
+                  <circle id="gauge-circle-vision" class="gauge-fill gauge-vision" cx="60" cy="60" r="48" />
+                </svg>
+                <div class="gauge-val-center">
+                  <span id="gauge-val-vision" class="gauge-number">0%</span>
+                  <span class="gauge-sub">YOLOv8</span>
+                </div>
+              </div>
+              <div class="gauge-label">
+                <span class="label-dot dot-vision"></span>
+                <span>P<sub>vision</sub> OPTICAL</span>
+              </div>
+            </div>
+
+            <!-- Gauge 2: Audio Confidence -->
+            <div class="gauge-item">
+              <div class="gauge-svg-wrapper">
+                <svg class="gauge-svg" viewBox="0 0 120 120">
+                  <circle class="gauge-bg" cx="60" cy="60" r="48" />
+                  <circle id="gauge-circle-audio" class="gauge-fill gauge-audio" cx="60" cy="60" r="48" />
+                </svg>
+                <div class="gauge-val-center">
+                  <span id="gauge-val-audio" class="gauge-number">0%</span>
+                  <span class="gauge-sub">SPECTRO</span>
+                </div>
+              </div>
+              <div class="gauge-label">
+                <span class="label-dot dot-audio"></span>
+                <span>P<sub>audio</sub> SIREN</span>
+              </div>
+            </div>
+
+            <!-- Gauge 3: Fusion Probability -->
+            <div class="gauge-item gauge-item-fusion">
+              <div class="gauge-svg-wrapper">
+                <svg class="gauge-svg" viewBox="0 0 120 120">
+                  <circle class="gauge-bg" cx="60" cy="60" r="48" />
+                  <circle id="gauge-circle-fusion" class="gauge-fill gauge-fusion" cx="60" cy="60" r="48" />
+                  <!-- 0.75 threshold mark -->
+                  <circle class="gauge-threshold-ring" cx="60" cy="60" r="48" />
+                </svg>
+                <div class="gauge-val-center">
+                  <span id="gauge-val-fusion" class="gauge-number highlight-fusion">0.00</span>
+                  <span class="gauge-sub" id="gauge-sub-fusion">STANDBY</span>
+                </div>
+              </div>
+              <div class="gauge-label">
+                <span class="label-dot dot-fusion"></span>
+                <span>P<sub>fusion</sub> BAYESIAN</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Adaptive Traffic Signal Controller (SVG 4-Way Intersection) -->
+        <div class="card traffic-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon">🚦</span>
+              <span>ADAPTIVE SIGNAL CONTROLLER [4-WAY INTERSECTION]</span>
+            </div>
+            <div class="card-badges">
+              <span id="signal-state-badge" class="badge badge-normal">CYCLING NORMAL</span>
+            </div>
+          </div>
+
+          <div class="traffic-light-container" id="traffic-light-container">
+            <!-- Dynamic SVG Injected via trafficLight.js -->
+          </div>
+        </div>
+
+        <!-- 3. Web Audio Waveform & Spectrogram Visualizer -->
+        <div class="card audio-viz-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon">🔊</span>
+              <span>ACOUSTIC SIREN SPECTRAL ANALYZER</span>
+            </div>
+            <div class="card-badges">
+              <span class="badge badge-band">700Hz - 1600Hz SIREN BAND</span>
+              <span id="audio-lock-badge" class="badge badge-muted">NO HARMONIC LOCK</span>
+            </div>
+          </div>
+          <div class="audio-canvas-wrapper">
+            <canvas id="audio-visualizer-canvas" class="audio-visualizer-canvas"></canvas>
+          </div>
+        </div>
+
+        <!-- 4. Telemetry Inspector & Manual Override Controls -->
+        <div class="card telemetry-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon">💻</span>
+              <span>SYSTEM EVENT DISPATCH & OVERRIDE</span>
+            </div>
+            <div class="card-actions">
+              <button id="btn-force-preempt" class="btn btn-sm btn-danger">🚨 FORCE PREEMPTION</button>
+              <button id="btn-reset-signal" class="btn btn-sm btn-outline">↺ RESET CYCLE</button>
+            </div>
+          </div>
+
+          <div class="event-stream" id="event-stream">
+            <div class="log-line log-info">[00:00.00] System initialized. Telemetry stream connected.</div>
+            <div class="log-line log-info">[00:00.00] YOLOv8 inference bound to video timeline.</div>
+            <div class="log-line log-info">[00:00.00] Acoustic harmonic monitor listening on 700-1600Hz.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Audio Context Activator Notice (if browser blocks unmuted audio) -->
+  <div id="audio-notice" class="audio-notice hidden">
+    <span>🔇 Click anywhere to enable siren audio stream</span>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
