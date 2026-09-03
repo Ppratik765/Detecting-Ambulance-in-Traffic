@@ -1,93 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ITS Command Center | Audio-Visual Preemption</title>
-    <link rel="stylesheet" href="./style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Audio-Visual Sensor Fusion for Emergency Preemption</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="dashboard">
-        <header class="header">
-            <h1>Emergency Preemption Command Center</h1>
-            <div class="status-indicator">
-                <span class="status-dot"></span>
-                <span class="status-text">System Active</span>
-            </div>
-        </header>
-
-        <main class="content-grid">
-            <!-- Left Side: Video Feed & Overlays -->
-            <section class="video-section card">
-                <div class="video-container">
-                    <!-- Fallback placeholder if no video -->
-                    <div class="video-placeholder">Loading Camera Feed...</div>
-                    <video id="cameraFeed" src="/data/ambulance_feed.mp4" muted loop controls></video>
-                    <canvas id="overlayCanvas"></canvas>
-                    
-                    <div class="preemption-alert hidden" id="preemptionAlert">
-                        EMERGENCY VEHICLE DETECTED
-                        <span>Preempting Traffic Controllers...</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Right Side: Telemetry, Fusion & Traffic Light -->
-            <section class="telemetry-section">
-                <!-- Gauges -->
-                <div class="gauges-container card">
-                    <h2>Sensor Confidence</h2>
-                    <div class="gauges">
-                        <div class="gauge">
-                            <svg viewBox="0 0 100 100">
-                                <circle class="gauge-bg" cx="50" cy="50" r="45"></circle>
-                                <circle class="gauge-fill vision-fill" cx="50" cy="50" r="45"></circle>
-                            </svg>
-                            <div class="gauge-value" id="valVision">0%</div>
-                            <div class="gauge-label">Vision (YOLOv8)</div>
-                        </div>
-                        <div class="gauge">
-                            <svg viewBox="0 0 100 100">
-                                <circle class="gauge-bg" cx="50" cy="50" r="45"></circle>
-                                <circle class="gauge-fill audio-fill" cx="50" cy="50" r="45"></circle>
-                            </svg>
-                            <div class="gauge-value" id="valAudio">0%</div>
-                            <div class="gauge-label">Audio (CNN)</div>
-                        </div>
-                        <div class="gauge highlight">
-                            <svg viewBox="0 0 100 100">
-                                <circle class="gauge-bg" cx="50" cy="50" r="45"></circle>
-                                <circle class="gauge-fill fusion-fill" cx="50" cy="50" r="45"></circle>
-                            </svg>
-                            <div class="gauge-value" id="valFusion">0%</div>
-                            <div class="gauge-label">Bayesian Fusion</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Traffic Light & Audio Visualizer -->
-                <div class="lower-section">
-                    <div class="traffic-controller card">
-                        <h2>Intersection Status</h2>
-                        <svg class="traffic-light" viewBox="0 0 100 250">
-                            <rect class="tl-body" x="20" y="10" width="60" height="230" rx="10"></rect>
-                            <circle class="tl-bulb tl-red active" cx="50" cy="50" r="25"></circle>
-                            <circle class="tl-bulb tl-yellow" cx="50" cy="125" r="25"></circle>
-                            <circle class="tl-bulb tl-green" cx="50" cy="200" r="25"></circle>
-                        </svg>
-                        <div class="tl-status" id="tlStatus">NORMAL OPERATION</div>
-                    </div>
-
-                    <div class="audio-viz card">
-                        <h2>Acoustic Signature</h2>
-                        <canvas id="audioCanvas"></canvas>
-                    </div>
-                </div>
-            </section>
-        </main>
+  <!-- Top Navigation Header -->
+  <header class="top-nav">
+    <div class="brand">
+      <div class="brand-icon">🚨</div>
+      <span class="brand-title">ITS Emergency Preemption</span>
+      <span class="brand-subtitle">Audio-Visual Late Bayesian Fusion System</span>
     </div>
-    
-    <script type="module" src="./main.js"></script>
+    <div class="nav-metrics">
+      <div class="metric-pill online">
+        <span class="live-dot"></span>
+        <span>EDGE NODE #04 ACTIVE</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Split-Screen Command Center UI -->
+  <main class="dashboard-split">
+    <!-- Left Pane (55%): Optical Camera Feed & YOLO Overlay -->
+    <section class="pane-left">
+      <div class="feed-header">
+        <span class="feed-title">CAM-01: APPROACH CORRIDOR [EASTBOUND]</span>
+        <span class="feed-timestamp" id="feedTimeDisplay">0.00s</span>
+      </div>
+
+      <div class="video-stage">
+        <!-- Emergency Preemption Alert Banner -->
+        <div class="emergency-banner hidden" id="emergencyBanner">
+          <span>🚨</span>
+          <span>EMERGENCY GREEN CORRIDOR TRIGGERED</span>
+          <span>🚨</span>
+        </div>
+
+        <!-- Video element with real-time overlay canvas -->
+        <video 
+          id="ambulanceVideo" 
+          src="/videos/ambulance_feed.mp4" 
+          controls 
+          loop 
+          playsinline
+          muted
+        ></video>
+        <canvas id="overlayCanvas"></canvas>
+      </div>
+
+      <div class="feed-controls">
+        <button class="btn-ctrl" id="btnTogglePlay">PLAY</button>
+        <button class="btn-ctrl" id="btnToggleMute">UNMUTE AUDIO</button>
+        <span class="feed-timeline-info" id="frameIndexDisplay">FRAME #0</span>
+      </div>
+    </section>
+
+    <!-- Right Pane (45%): Telemetry Gauges, Signal Controller, Audio Waveform -->
+    <section class="pane-right">
+      <!-- 1. Sensor Probabilities & Bayesian Fusion Gauges -->
+      <div class="card">
+        <div class="card-title">
+          <span>Multimodal Confidence Metrics</span>
+          <span class="badge">LATE FUSION</span>
+        </div>
+        <div class="gauges-row">
+          <!-- Vision Gauge -->
+          <div class="gauge-item">
+            <svg class="gauge-svg" viewBox="0 0 80 80">
+              <circle class="gauge-track" cx="40" cy="40" r="35"></circle>
+              <circle class="gauge-progress vision" id="gaugeProgVision" cx="40" cy="40" r="35"></circle>
+            </svg>
+            <div class="gauge-val-display" id="gaugeValVision">0%</div>
+            <div class="gauge-caption">VISION (YOLOv8)</div>
+            <div class="gauge-formula">P(Vision)</div>
+          </div>
+
+          <!-- Audio Gauge -->
+          <div class="gauge-item">
+            <svg class="gauge-svg" viewBox="0 0 80 80">
+              <circle class="gauge-track" cx="40" cy="40" r="35"></circle>
+              <circle class="gauge-progress audio" id="gaugeProgAudio" cx="40" cy="40" r="35"></circle>
+            </svg>
+            <div class="gauge-val-display" id="gaugeValAudio">0%</div>
+            <div class="gauge-caption">ACOUSTIC (CNN)</div>
+            <div class="gauge-formula">P(Audio)</div>
+          </div>
+
+          <!-- Late Bayesian Fusion Gauge -->
+          <div class="gauge-item fusion-gauge">
+            <svg class="gauge-svg" viewBox="0 0 80 80">
+              <circle class="gauge-track" cx="40" cy="40" r="35"></circle>
+              <circle class="gauge-progress fusion" id="gaugeProgFusion" cx="40" cy="40" r="35"></circle>
+            </svg>
+            <div class="gauge-val-display" id="gaugeValFusion">0%</div>
+            <div class="gauge-caption">BAYESIAN FUSION</div>
+            <div class="gauge-formula">1 - (1-Pv)(1-Pa)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Adaptive Traffic Signal Controller (4-Way Intersection SVG) -->
+      <div class="card">
+        <div class="card-title">
+          <span>Intersection Signal Controller</span>
+          <span class="badge">ADAPTIVE ITS</span>
+        </div>
+        <div id="trafficSignalMount"></div>
+      </div>
+
+      <!-- 3. Real-Time Web Audio API Waveform & Spectrogram -->
+      <div class="card visualizer-card">
+        <div class="card-title">
+          <span>Acoustic Waveform Monitor</span>
+          <span class="badge">16 kHz MEL-ANALYSIS</span>
+        </div>
+        <canvas id="audioVisualizer"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>
