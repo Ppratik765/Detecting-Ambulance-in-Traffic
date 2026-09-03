@@ -122,21 +122,49 @@ Follow these instructions to run the machine learning pipeline on Google Colab:
 4. Ensure hardware acceleration is set to GPU:
    * Go to **Runtime** &rarr; **Change runtime type** &rarr; Select **T4 GPU** &rarr; Click **Save**.
 
-### 2. Execute the Pipeline
-Run all cells sequentially (**Runtime** &rarr; **Run all** or `Ctrl + F9`):
+### 2. Video Sourcing & Ingestion (Step 2 in Colab)
+In Step 2 of the notebook, choose your preferred ingestion method:
+
+#### 🔍 Recommended YouTube Search Queries:
+If using YouTube, search for any of these queries on YouTube:
+* `ambulance sirens intersection dashcam`
+* `ambulance emergency response lights and sirens intersection`
+* `ambulance crossing red light sirens`
+* `ambulance responding through traffic intersection`
+
+**Selection Tips:**
+* Filter YouTube results by **Duration (< 4 minutes)** or Shorts.
+* Look for clips where an ambulance approaches the camera/intersection and sirens are clearly audible.
+* Copy the YouTube link and paste it into the `YOUTUBE_URL` form field in Colab.
+
+#### 📤 Method B: Upload Direct Video File (Most Reliable)
+Because YouTube occasionally throttles or bot-blocks Google Colab cloud IP addresses, the notebook includes a direct upload option (`files.upload()`):
+1. Download your chosen traffic video to your computer.
+2. Select **Upload Video File (Recommended)** in the Colab dropdown.
+3. Colab will prompt you to select the file from your computer. The notebook automatically normalizes it to web-compatible H.264 30 FPS 720p.
+
+### 3. Execute the Machine Learning Pipeline
+Run all remaining cells (**Runtime** &rarr; **Run all** or `Ctrl + F9`):
 1. **Cell 1 (Dependencies):** Installs `ultralytics`, `torchaudio`, `librosa`, `yt-dlp`, and `soundfile`.
-2. **Cell 2 (Ingestion):** Downloads traffic video via `yt-dlp` or generates a high-fidelity synthetic benchmark clip.
-3. **Cell 3 (Vision):** Loads `yolov8n.pt` and extracts vehicle bounding boxes and optical scores.
-4. **Cell 4 (Audio):** Computes Mel-Spectrograms and analyzes 700Hz - 1600Hz acoustic siren energy bands.
-5. **Cell 5 (Fusion):** Computes $P_{fusion} = 1 - (1 - P_{vision})(1 - P_{audio})$ frame-by-frame and checks threshold $\ge 0.75$.
-6. **Cell 6 (Export):** Packages all inferences into `telemetry.json` and triggers automatic browser download.
+2. **Cell 2 (Ingestion):** Ingests and transcodes the video to `ambulance_feed.mp4`.
+3. **Cell 3 (Vision):** Loads `yolov8n.pt` and extracts vehicle bounding boxes and optical scores ($P_{vision}$).
+4. **Cell 4 (Audio):** Computes 128-band Mel-Spectrograms and analyzes 700Hz - 1600Hz acoustic siren harmonics ($P_{audio}$).
+5. **Cell 5 (Fusion):** Computes $P_{fusion} = 1 - (1 - P_{vision})(1 - P_{audio})$ frame-by-frame and evaluates preemption status ($P_{fusion} \ge 0.75$).
+6. **Cell 6 (Export):** Packages all inferences into `telemetry.json` and automatically downloads both `telemetry.json` and `ambulance_feed.mp4` to your browser.
 
-### 3. Save Downloaded Artifacts to Frontend
-Once Colab finishes, two files will be saved/downloaded:
-1. Move `telemetry.json` &rarr; `frontend/public/data/telemetry.json`
-2. Move `ambulance_feed.mp4` &rarr; `frontend/public/videos/ambulance_feed.mp4`
+### 4. Load Colab Output into the Dashboard
+You have two ways to load the Colab artifacts:
 
-*(Note: High-fidelity sample assets are already pre-generated in `frontend/public/` so you can launch the dashboard immediately without waiting for Colab!)*
+* **Option A (In-Browser Direct Loader - Easiest!):**
+  1. Open the running dashboard at `http://localhost:5173`.
+  2. Click **📂 Load Colab telemetry.json** in the top toolbar and select your downloaded `telemetry.json`.
+  3. Click **📹 Load Colab Video** and select your downloaded `ambulance_feed.mp4`.
+  4. The dashboard will instantly switch to **🟢 VERIFIED COLAB PIPELINE** mode!
+
+* **Option B (File System Replacement):**
+  1. Move your downloaded `telemetry.json` into: `frontend/public/data/telemetry.json`
+  2. Move your downloaded `ambulance_feed.mp4` into: `frontend/public/videos/ambulance_feed.mp4`
+  3. Refresh the dashboard!
 
 ---
 
