@@ -159,17 +159,37 @@ function drawBoundingBox(frame) {
   if (!bbox || bbox.length < 4) return;
 
   // Expected native video resolution (1280x720 or 1920x1080)
-  const videoWidth = video.videoWidth || 1280;
-  const videoHeight = video.videoHeight || 720;
+  const videoWidth = video.videoWidth || 1920;
+  const videoHeight = video.videoHeight || 1080;
   
-  const scaleX = overlayCanvas.width / videoWidth;
-  const scaleY = overlayCanvas.height / videoHeight;
+  // Compute letterbox / pillarbox offsets since video uses object-fit: contain
+  const containerW = overlayCanvas.width;
+  const containerH = overlayCanvas.height;
+  const videoAspect = videoWidth / videoHeight;
+  const containerAspect = containerW / containerH;
+
+  let renderW, renderH, offsetX, offsetY;
+  if (containerAspect > videoAspect) {
+    // Pillarbox: black bars on left & right
+    renderH = containerH;
+    renderW = containerH * videoAspect;
+    offsetX = (containerW - renderW) / 2;
+    offsetY = 0;
+  } else {
+    // Letterbox: black bars on top & bottom
+    renderW = containerW;
+    renderH = containerW / videoAspect;
+    offsetX = 0;
+    offsetY = (containerH - renderH) / 2;
+  }
+
+  const scale = renderW / videoWidth;
 
   const [x1, y1, x2, y2] = bbox;
-  const bx = x1 * scaleX;
-  const by = y1 * scaleY;
-  const bw = (x2 - x1) * scaleX;
-  const bh = (y2 - y1) * scaleY;
+  const bx = offsetX + (x1 * scale);
+  const by = offsetY + (y1 * scale);
+  const bw = (x2 - x1) * scale;
+  const bh = (y2 - y1) * scale;
 
   // Glowing Bounding Box
   ctx.save();
