@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITS Command Center | Audio-Visual Preemption</title>
+    <link rel="stylesheet" href="./style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard">
+        <header class="header">
+            <h1>Emergency Preemption Command Center</h1>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span class="status-text">System Active</span>
+            </div>
+        </header>
+
+        <main class="content-grid">
+            <!-- Left Side: Video Feed & Overlays -->
+            <section class="video-section card">
+                <div class="video-container">
+                    <!-- Fallback placeholder if no video -->
+                    <div class="video-placeholder">Loading Camera Feed...</div>
+                    <video id="cameraFeed" src="/data/ambulance_feed.mp4" muted loop controls></video>
+                    <canvas id="overlayCanvas"></canvas>
+                    
+                    <div class="preemption-alert hidden" id="preemptionAlert">
+                        EMERGENCY VEHICLE DETECTED
+                        <span>Preempting Traffic Controllers...</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Side: Telemetry, Fusion & Traffic Light -->
+            <section class="telemetry-section">
+                <!-- Gauges -->
+                <div class="gauges-container card">
+                    <h2>Sensor Confidence</h2>
+                    <div class="gauges">
+                        <div class="gauge">
+                            <svg viewBox="0 0 100 100">
+                                <circle class="gauge-bg" cx="50" cy="50" r="45"></circle>
+                                <circle class="gauge-fill vision-fill" cx="50" cy="50" r="45"></circle>
+                            </svg>
+                            <div class="gauge-value" id="valVision">0%</div>
+                            <div class="gauge-label">Vision (YOLOv8)</div>
+                        </div>
+                        <div class="gauge">
+                            <svg viewBox="0 0 100 100">
+                                <circle class="gauge-bg" cx="50" cy="50" r="45"></circle>
+                                <circle class="gauge-fill audio-fill" cx="50" cy="50" r="45"></circle>
+                            </svg>
+                            <div class="gauge-value" id="valAudio">0%</div>
+                            <div class="gauge-label">Audio (CNN)</div>
+                        </div>
+                        <div class="gauge highlight">
+                            <svg viewBox="0 0 100 100">
+                                <circle class="gauge-bg" cx="50" cy="50" r="45"></circle>
+                                <circle class="gauge-fill fusion-fill" cx="50" cy="50" r="45"></circle>
+                            </svg>
+                            <div class="gauge-value" id="valFusion">0%</div>
+                            <div class="gauge-label">Bayesian Fusion</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Traffic Light & Audio Visualizer -->
+                <div class="lower-section">
+                    <div class="traffic-controller card">
+                        <h2>Intersection Status</h2>
+                        <svg class="traffic-light" viewBox="0 0 100 250">
+                            <rect class="tl-body" x="20" y="10" width="60" height="230" rx="10"></rect>
+                            <circle class="tl-bulb tl-red active" cx="50" cy="50" r="25"></circle>
+                            <circle class="tl-bulb tl-yellow" cx="50" cy="125" r="25"></circle>
+                            <circle class="tl-bulb tl-green" cx="50" cy="200" r="25"></circle>
+                        </svg>
+                        <div class="tl-status" id="tlStatus">NORMAL OPERATION</div>
+                    </div>
+
+                    <div class="audio-viz card">
+                        <h2>Acoustic Signature</h2>
+                        <canvas id="audioCanvas"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script type="module" src="./main.js"></script>
+</body>
+</html>
