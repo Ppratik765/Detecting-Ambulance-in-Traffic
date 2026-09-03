@@ -36,13 +36,13 @@ Designed for Google Colab with a **T4 GPU**. Uses `ultralytics`, `torchaudio`, `
 ### Automated Datasets Handled:
 1. **Visual Dataset:** `abhisheksinghblr/emergency-vehicles-identification`
    - Automated structuring into YOLO format.
-   - Fine-tunes `yolov8n.pt` for 3 epochs on emergency vehicle images to output $P_{vision}$ and bounding boxes.
+   - Fine-tunes `yolov8n.pt` for 10 epochs with early stopping (`patience=5`) to output $P_{vision}$, mAP50, and high F1-score bounding boxes.
 2. **Acoustic Dataset:** `vishnu-u/Siren-Sound-Dataset`
    - Loads WAV files, extracts 64-band log Mel-Spectrograms at 16 kHz.
-   - Trains a 3-layer 2D CNN with BatchNorm and MaxPool to classify siren sounds vs. ambient/traffic noise ($P_{audio}$).
+   - Trains a 5-layer Deep 2D CNN (16 -> 32 -> 64 -> 128 -> 128 channels) with BatchNorm, Dropout (0.25-0.3), and learning rate scheduling to classify siren sounds vs. ambient/traffic noise ($P_{audio}$) with high F1-score.
 3. **Test Video:** `musawerhussain/ambu-test`
    - Locates `3759222-hd_1920_1080_30fps.mp4`.
-   - Uses `moviepy` to overlay sample siren audio onto the video, producing `ambulance_feed.mp4`.
+   - Uses FFmpeg stream copy to overlay sample siren audio onto the video, producing `ambulance_feed.mp4`.
 
 ### Multimodal Late Bayesian Fusion:
 $$P_{fusion} = 1 - (1 - P_{vision}) \times (1 - P_{audio})$$
