@@ -51,6 +51,31 @@
       </div>
     </header>
 
+    <!-- Secondary Data Ingestion & Source Status Toolbar -->
+    <div class="data-source-toolbar">
+      <div class="toolbar-left">
+        <span class="source-label">PIPELINE DATA SOURCE:</span>
+        <span id="data-source-badge" class="badge badge-demo">SIMULATED BENCHMARK DEMO</span>
+        <span id="data-source-hint" class="source-hint">(Showing baseline sample. Run Colab notebook to generate real YOLOv8 & PyTorch inferences)</span>
+      </div>
+      <div class="toolbar-right">
+        <!-- Direct File Loaders for Colab Exports -->
+        <input type="file" id="file-telemetry-input" accept=".json" style="display: none;" />
+        <input type="file" id="file-video-input" accept="video/mp4,video/*" style="display: none;" />
+
+        <button id="btn-load-telemetry" class="btn btn-sm btn-accent" title="Upload telemetry.json downloaded from Google Colab">
+          📂 Load Colab telemetry.json
+        </button>
+        <button id="btn-load-video" class="btn btn-sm btn-accent" title="Upload ambulance_feed.mp4 downloaded from Google Colab">
+          📹 Load Colab Video
+        </button>
+        <button id="btn-toggle-demo" class="btn btn-sm btn-outline" title="Toggle between Benchmark Demo and Clean Standby">
+          🔄 Standby / Blank Mode
+        </button>
+      </div>
+    </div>
+
+
     <!-- Main Split-Screen Workspace -->
     <main class="main-workspace">
       <!-- Left Pane (55%): Optical Feed & Video Canvas Overlay -->

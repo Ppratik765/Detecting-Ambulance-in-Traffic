@@ -42,6 +42,17 @@ class AppSyncEngine {
     this.resetSignalBtn = document.getElementById('btn-reset-signal');
     this.audioNotice = document.getElementById('audio-notice');
 
+    // Pipeline Data Ingestion & Mode Elements
+    this.dataSourceBadge = document.getElementById('data-source-badge');
+    this.dataSourceHint = document.getElementById('data-source-hint');
+    this.btnLoadTelemetry = document.getElementById('btn-load-telemetry');
+    this.btnLoadVideo = document.getElementById('btn-load-video');
+    this.btnToggleDemo = document.getElementById('btn-toggle-demo');
+    this.fileTelemetryInput = document.getElementById('file-telemetry-input');
+    this.fileVideoInput = document.getElementById('file-video-input');
+
+    this.currentMode = 'demo'; // 'demo' | 'standby' | 'colab'
+
     // Subsystem Controllers
     this.gauges = new GaugeController();
     this.trafficLight = new TrafficLightController('traffic-light-container');
@@ -139,6 +150,16 @@ class AppSyncEngine {
    * Synchronizes all dashboard subsystems to a specific timestamp
    */
   syncFrame(currentTime) {
+    if (this.currentMode === 'standby') {
+      this.gauges.update(0, 0, 0, false);
+      this.trafficLight.update(currentTime, false);
+      this.detectionOverlay.update([], false);
+      this.visualizer.update(0);
+      this.preemptionManager.update(false, currentTime, 0);
+      this.updateTimeDisplay(currentTime);
+      return;
+    }
+
     const frame = this.findClosestFrame(currentTime);
     const pVision = frame ? frame.p_vision : 0;
     const pAudio = frame ? frame.p_audio : 0;
@@ -365,6 +386,103 @@ class AppSyncEngine {
           'info',
           'Signal controller manually reset to normal cycle.'
         );
+      });
+    }
+
+    // Pipeline Loaders: Telemetry JSON
+    if (this.btnLoadTelemetry && this.fileTelemetryInput) {
+      this.btnLoadTelemetry.addEventListener('click', () => {
+        this.fileTelemetryInput.click();
+      });
+
+      this.fileTelemetryInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const parsed = JSON.parse(event.target.result);
+            if (!parsed.frames || !Array.isArray(parsed.frames)) {
+              throw new Error('Missing frames array in telemetry JSON');
+            }
+            this.telemetry = parsed;
+            this.frames = parsed.frames;
+            this.currentMode = 'colab';
+            if (this.dataSourceBadge) {
+              this.dataSourceBadge.textContent = '🟢 VERIFIED COLAB TELEMETRY';
+              this.dataSourceBadge.className = 'badge badge-colab';
+            }
+            if (this.dataSourceHint) {
+              this.dataSourceHint.textContent = `(${this.frames.length} real ML inference frames loaded from ${file.name})`;
+            }
+            this.preemptionManager.logEvent(
+              this.video.currentTime,
+              'info',
+              `Loaded Colab telemetry: ${file.name} (${this.frames.length} frames).`
+            );
+            this.syncFrame(this.video.currentTime);
+          } catch (err) {
+            alert('Invalid telemetry.json format: ' + err.message);
+          }
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    // Pipeline Loaders: Video MP4
+    if (this.btnLoadVideo && this.fileVideoInput) {
+      this.btnLoadVideo.addEventListener('click', () => {
+        this.fileVideoInput.click();
+      });
+
+      this.fileVideoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const url = URL.createObjectURL(file);
+        this.video.src = url;
+        this.video.load();
+        this.preemptionManager.logEvent(
+          0,
+          'info',
+          `Loaded Colab video feed: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB).`
+        );
+        if (this.currentMode === 'colab' && this.dataSourceBadge) {
+          this.dataSourceBadge.textContent = '🟢 VERIFIED COLAB PIPELINE (VIDEO + DATA)';
+        }
+      });
+    }
+
+    // Toggle Standby / Clean Mode
+    if (this.btnToggleDemo) {
+      this.btnToggleDemo.addEventListener('click', () => {
+        if (this.currentMode !== 'standby') {
+          this.currentMode = 'standby';
+          this.video.pause();
+          if (this.dataSourceBadge) {
+            this.dataSourceBadge.textContent = 'STANDBY (NO VIDEO)';
+            this.dataSourceBadge.className = 'badge badge-standby';
+          }
+          if (this.dataSourceHint) {
+            this.dataSourceHint.textContent = '(Canvas cleared. Awaiting Colab upload or click "Switch to Demo")';
+          }
+          this.btnToggleDemo.textContent = '▶ Switch to Demo Benchmark';
+          this.btnToggleDemo.className = 'btn btn-sm btn-accent';
+          this.preemptionManager.logEvent(0, 'info', 'Switched to clean Standby mode. Canvas overlays cleared.');
+          this.syncFrame(0);
+        } else {
+          this.currentMode = 'demo';
+          if (this.dataSourceBadge) {
+            this.dataSourceBadge.textContent = 'SIMULATED BENCHMARK DEMO';
+            this.dataSourceBadge.className = 'badge badge-demo';
+          }
+          if (this.dataSourceHint) {
+            this.dataSourceHint.textContent = '(Showing baseline sample. Run Colab notebook to generate real YOLOv8 & PyTorch inferences)';
+          }
+          this.btnToggleDemo.textContent = '🔄 Standby / Blank Mode';
+          this.btnToggleDemo.className = 'btn btn-sm btn-outline';
+          this.preemptionManager.logEvent(0, 'info', 'Switched to benchmark demo mode.');
+          this.syncFrame(this.video.currentTime);
+        }
       });
     }
 

@@ -293,6 +293,62 @@ html, body {
   letter-spacing: 1px;
 }
 
+/* Data Source Toolbar */
+.data-source-toolbar {
+  background: rgba(9, 14, 23, 0.95);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 8px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+
+.source-label {
+  color: #64748b;
+  font-weight: 700;
+}
+
+.badge-demo {
+  color: var(--neon-amber);
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.badge-colab {
+  color: var(--neon-green);
+  background: rgba(16, 185, 129, 0.15);
+  border-color: var(--neon-green);
+  box-shadow: 0 0 10px var(--neon-green-glow);
+}
+
+.badge-standby {
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.source-hint {
+  color: #475569;
+  font-size: 11px;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
 /* ==========================================================================
    Main Workspace: Split-Screen (55% / 45%)
    ========================================================================== */
